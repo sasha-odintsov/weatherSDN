@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+</head>
+<body>
+    <div id="city"></div>
+    <div id="temp"></div>
+    <div id="condition"></div>
+    <script>
+        // function Weather(city) {
+        //     this.city = city;
+        // };
+        // WeatherRemote.prototype = Object.create(Weather.prototype);        
+
+        function Weather(city) {
+            this.city = city;
+        };
+
+        Weather.prototype.removeClouds = function() {
+            this.condition = 'Sun';
+        };
+
+        Weather.prototype.addSnow = function() {
+            this.condition = 'Snow';
+        };        
+
+        Weather.prototype.init = function() {
+            const fn = function (data) {
+                this.temp = data.temp;
+                this.condition = data.condition;
+                return data;
+            }.bind(this);
+
+            return fetch(`https://api.weatherapi.com/v1/current.json?key=b677082ac19f45aca07212645220401&q=${this.city}&aqi=no`)
+            
+            .then((response) => response.json())
+            .then((data) => {
+            console.log(data);
+                return {
+                    city: data.location.name,
+                    temp: data.current.temp_c,
+                    condition: data.current.condition.text
+                };         
+            })
+            .then(fn)             
+        };
+        
+        const kiev = new Weather('Kiev')
+        kiev.init().then(data => {
+        document.getElementById('city').innerHTML = data.city;
+        document.getElementById('temp').innerHTML = data.temp;
+        document.getElementById('condition').innerHTML = data.condition;
+        });   
+        // kiev.removeClouds();
+        // kiev.addSnow();
+        console.log(kiev);
+    </script>
+</body>
+</html>
